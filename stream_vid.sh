@@ -1,0 +1,1 @@
+gst-launch-1.0 uvch264src initial-bitrate=2000000 average-bitrate=2000000 iframe-period=1000 name=src auto-start=true src.vidsrc ! video/x-h264,height=360,framerate=30/1 ! h264parse ! rtph264pay ! udpsink host=192.168.1.17 port=6666
