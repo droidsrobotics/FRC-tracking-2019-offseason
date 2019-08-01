@@ -100,6 +100,8 @@ while True:
             break
         if calibrated:
             break
+        del hsv
+        del full_img
 
 cv2.destroyAllWindows()
 
