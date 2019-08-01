@@ -7,6 +7,7 @@ import numpy as np
 import struct
 import socket
 import random
+import gc
 
 calibrated = False
 lower_green=np.array([0,0,0])
@@ -104,6 +105,7 @@ while True:
         del full_img
 
 cv2.destroyAllWindows()
+gc.collect()
 
 while True:
 
