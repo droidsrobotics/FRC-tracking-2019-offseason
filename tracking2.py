@@ -15,18 +15,20 @@ upper_green=np.array([180,125,80])
 
 # initialize the camera
 camid = str(sys.argv[1])
-cam = cv2.VideoCapture(int(camid))
+#cam = cv2.VideoCapture(int(camid))
 print("init camera on /dev/video"+camid)
-#os.system('v4l2-ctl --set-ctrl=exposure_auto=3 -d /dev/video'+camid)
+
+os.system('v4l2-ctl --set-ctrl=exposure_auto=1 -d /dev/video'+camid)
+os.system('v4l2-ctl --set-ctrl=exposure_absolute=10 -d /dev/video'+camid)
 
 
 xdim = 320
 ydim = 240
 
-cam.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0.25)
-cam.set(cv2.CAP_PROP_EXPOSURE,.001);
-cam.set(cv2.CAP_PROP_FRAME_WIDTH,xdim);
-cam.set(cv2.CAP_PROP_FRAME_HEIGHT,ydim);
+#cam.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0.25)
+#cam.set(cv2.CAP_PROP_EXPOSURE,.001);
+#cam.set(cv2.CAP_PROP_FRAME_WIDTH,xdim);
+#cam.set(cv2.CAP_PROP_FRAME_HEIGHT,ydim);
 
 # # set up network socket/addresses
 # host = 'localhost'
@@ -38,7 +40,11 @@ cam.set(cv2.CAP_PROP_FRAME_HEIGHT,ydim);
 # print ("Active on port: " + str(Lport))
 # robot_address = (host, Rport)
 
-out = cv2.VideoWriter('appsrc ! videoconvert ! video/x-raw,format=YUY2,width=640,height=480,framerate=30/1 ! jpegenc ! rtpjpegpay ! udpsink host=192.168.1.23 port=5000',0, 25.0, (xdim, ydim), True)
+#out = cv2.VideoWriter('appsrc ! videoconvert ! video/x-raw,format=YUY2,width=640,height=480,framerate=30/1 ! jpegenc ! rtpjpegpay ! udpsink host=192.168.1.23 port=5000',0, 25.0, (xdim, ydim), True)
+
+cam = cv2.VideoCapture('v4l2src device=/dev/video'+camid+' ! video/x-raw,framerate=30/1,width='+str(xdim)+',height='+str(ydim)+' ! videoscale ! videoconvert ! appsink', cv2.CAP_GSTREAMER)
+
+out = cv2.VideoWriter('appsrc ! videoconvert ! video/x-raw,format=YUY2,width='+str(xdim)+',height='+str(ydim)+',framerate=30/1 ! jpegenc ! rtpjpegpay ! udpsink host=192.168.1.23 port=5000',cv2.CAP_GSTREAMER,0,30,(xdim,ydim),True);
 
 
 buffer = 40 # color range buffer
