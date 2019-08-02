@@ -19,6 +19,7 @@ cam = cv2.VideoCapture(int(camid))
 print("init camera on /dev/video"+camid)
 #os.system('v4l2-ctl --set-ctrl=exposure_auto=3 -d /dev/video'+camid)
 
+
 xdim = 320
 ydim = 240
 
@@ -36,6 +37,9 @@ cam.set(cv2.CAP_PROP_FRAME_HEIGHT,ydim);
 # sock.bind(("", Lport))
 # print ("Active on port: " + str(Lport))
 # robot_address = (host, Rport)
+
+out = cv2.VideoWriter('appsrc ! videoconvert ! video/x-raw,format=YUY2,width=640,height=480,framerate=30/1 ! jpegenc ! rtpjpegpay ! udpsink host=192.168.1.23 port=5000',0, 25.0, (xdim, ydim), True)
+
 
 buffer = 40 # color range buffer
 xtarget = 0
@@ -108,8 +112,9 @@ cv2.destroyAllWindows()
 gc.collect()
 
 while True:
-
+ try:
     cv2.imshow("robotimgPi", full_img)
+    out.write(full_img)
 
     ret, full_img=cam.read()
     imgHSV = cv2.cvtColor(full_img,cv2.COLOR_BGR2HSV)
@@ -185,3 +190,6 @@ while True:
     # if the `q` key was pressed, break from the loop
     if key == ord("q"):
     	break
+
+ except:
+     pass
