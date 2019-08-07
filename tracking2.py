@@ -23,8 +23,8 @@ os.system('v4l2-ctl --set-ctrl=exposure_auto=1 -d /dev/video'+camid)
 os.system('v4l2-ctl --set-ctrl=exposure_absolute=10 -d /dev/video'+camid)
 
 
-xdim = 320
-ydim = 240
+xdim = 640
+ydim = 480
 
 #cam.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0.25)
 #cam.set(cv2.CAP_PROP_EXPOSURE,.001);
