@@ -10,11 +10,12 @@ import random
 import gc
 
 calibrated = False
-lower_green=np.array([0,0,0])
-upper_green=np.array([180,125,80])
+lower_green=np.array([0,0,100])
+upper_green=np.array([180,255,255])
 
 # initialize the camera
 camid = str(sys.argv[1])
+sendIP = str(sys.argv[2])
 #cam = cv2.VideoCapture(int(camid))
 print("init camera on /dev/video"+camid)
 
@@ -44,7 +45,9 @@ ydim = 240
 
 cam = cv2.VideoCapture('v4l2src device=/dev/video'+camid+' ! video/x-raw,framerate=30/1,width='+str(xdim)+',height='+str(ydim)+' ! videoscale ! videoconvert ! appsink', cv2.CAP_GSTREAMER)
 
-out = cv2.VideoWriter('appsrc ! videoconvert ! video/x-raw,format=YUY2,width='+str(xdim)+',height='+str(ydim)+',framerate=30/1 ! jpegenc ! rtpjpegpay ! udpsink host=192.168.1.23 port=5000',cv2.CAP_GSTREAMER,0,30,(xdim,ydim),True);
+#out = cv2.VideoWriter('appsrc ! videoconvert ! video/x-raw,format=YUY2,width='+str(xdim)+',height='+str(ydim)+',framerate=30/1 ! jpegenc ! rtpjpegpay ! udpsink host='+sendIP+' port=5000',cv2.CAP_GSTREAMER,0,30,(xdim,ydim),True);
+
+out = cv2.VideoWriter('appsrc ! videoconvert ! video/x-raw,format=I420 ! omxh264enc ! video/x-h264,profile=baseline ! rtph264pay ! udpsink host='+sendIP+' port=5000',cv2.CAP_GSTREAMER,0,30,(xdim,ydim),True);
 
 
 buffer = 40 # color range buffer
@@ -80,7 +83,7 @@ def FindColor(lower_col, upper_col, min_area):
     # this removes noise by eroding and filling in
     maskOpen=cv2.morphologyEx(mask,cv2.MORPH_OPEN,kernelOpen)
     maskClose=cv2.morphologyEx(maskOpen,cv2.MORPH_CLOSE,kernelClose)
-    a, conts, h = cv2.findContours(maskClose, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    conts, h = cv2.findContours(maskClose, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     # Finding bigest  area and save the contour
     targets = []
     for cont in conts:
@@ -99,7 +102,8 @@ def on_mouse_click (event, x, y, flags, frame):
         upper_green=np.array([frame[y,x].tolist()[0]+buffer,frame[y,x].tolist()[1]+buffer,frame[y,x].tolist()[2]+buffer])
         calibrated = True
 
-
+ret, full_img = cam.read()
+"""
 while True:
         ret, full_img = cam.read()
         hsv = cv2.cvtColor(full_img,cv2.COLOR_BGR2HSV)
@@ -115,11 +119,12 @@ while True:
         del full_img
 
 cv2.destroyAllWindows()
+"""
 gc.collect()
 
 while True:
  try:
-    cv2.imshow("robotimgPi", full_img)
+#    cv2.imshow("robotimgPi", full_img)
     out.write(full_img)
 
     ret, full_img=cam.read()
