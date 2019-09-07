@@ -14,8 +14,8 @@ lower_green=np.array([0,0,100])
 upper_green=np.array([180,255,255])
 
 # initialize the camera
-camid = str(sys.argv[1])
-sendIP = str(sys.argv[2])
+camid = "2"
+sendIP = "10.99.98.5"
 #cam = cv2.VideoCapture(int(camid))
 print("init camera on /dev/video"+camid)
 
@@ -31,15 +31,13 @@ ydim = 480
 #cam.set(cv2.CAP_PROP_FRAME_WIDTH,xdim);
 #cam.set(cv2.CAP_PROP_FRAME_HEIGHT,ydim);
 
-# # set up network socket/addresses
-# host = 'localhost'
-# Lport = 4000
-# Rport = 5000
-# sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-# sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-# sock.bind(("", Lport))
-# print ("Active on port: " + str(Lport))
-# robot_address = (host, Rport)
+# set up network socket/addresses
+host = '10.99.98.2'
+Lport = 9998
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+sock.bind(("", Lport))
+print ("Active on port: " + str(Lport))
 
 #out = cv2.VideoWriter('appsrc ! videoconvert ! video/x-raw,format=YUY2,width=640,height=480,framerate=30/1 ! jpegenc ! rtpjpegpay ! udpsink host=192.168.1.23 port=5000',0, 25.0, (xdim, ydim), True)
 
@@ -59,9 +57,9 @@ kernelClose=np.ones((20,20))
 
 
 
-def SendToRobot(left, right, error, P, I, D):
+def SendToRobot(dataIn):
     global sock
-    data = str(left)+";"+str(right)+";"+str(error)+";"+str(P)+";"+str(I)+";"+str(D)
+    data = str(dataIn)+";"
     send_msg = str(str(data)).encode()
     try:
           sock.sendto(send_msg, robot_address)
@@ -194,6 +192,7 @@ while True:
     cv2.putText(full_img, "dx="+str(xtarget), (10, 50), cv2.FONT_HERSHEY_PLAIN, 2, (20, 255, 255), 2)
 
     print("dx="+str(xtarget))
+    SendToRobot(xtarget)
 
 
 
