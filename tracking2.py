@@ -14,7 +14,7 @@ lower_green=np.array([0,0,100])
 upper_green=np.array([180,255,255])
 
 # initialize the camera
-camid = "2"
+camid = "0"
 sendIP = "10.99.98.5"
 #cam = cv2.VideoCapture(int(camid))
 print("init camera on /dev/video"+camid)
@@ -37,6 +37,7 @@ Lport = 9998
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 sock.bind(("", Lport))
+robot_address = (host, Lport)
 print ("Active on port: " + str(Lport))
 
 #out = cv2.VideoWriter('appsrc ! videoconvert ! video/x-raw,format=YUY2,width=640,height=480,framerate=30/1 ! jpegenc ! rtpjpegpay ! udpsink host=192.168.1.23 port=5000',0, 25.0, (xdim, ydim), True)
@@ -125,7 +126,8 @@ while True:
 #    cv2.imshow("robotimgPi", full_img)
     out.write(full_img)
 
-    ret, full_img=cam.read()
+    ret, full_flip_img=cam.read()
+    full_img = cv2.flip(full_flip_img, 0)
     imgHSV = cv2.cvtColor(full_img,cv2.COLOR_BGR2HSV)
     key = cv2.waitKey(1) & 0xFF
 
